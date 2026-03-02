@@ -159,7 +159,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	function renderTokenPreview() {
 		if (!tokenPreview || !githubTokenInput) return;
-		tokenPreview.innerHTML = '';
+		tokenPreview.textContent = '';
 		const value = githubTokenInput.value;
 		const isDark = document.body.classList.contains('dark-mode');
 		for (let i = 0; i < value.length; i++) {
@@ -335,7 +335,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 				// fix 1
-				scrumReport.innerHTML = '';
+				scrumReport.textContent = '';
 
 				const p = document.createElement('p');
 				p.style.textAlign = 'center';
@@ -346,7 +346,7 @@ document.addEventListener('DOMContentLoaded', () => {
 				scrumReport.appendChild(p);
 			} else {
 				if (scrumReport.firstElementChild && scrumReport.firstElementChild.textContent === chrome.i18n.getMessage('extensionDisabledMessage')) {
-					scrumReport.innerHTML = '';
+					scrumReport.textContent = '';
 				}
 			}
 		}
@@ -605,9 +605,16 @@ document.addEventListener('DOMContentLoaded', () => {
 				// Strip HTML tags to copy plain text; adjust to writeText vs write as needed.
 				const plainText = scrumReport.innerText || scrumReport.textContent;
 				navigator.clipboard.writeText(plainText).then(() => {
-					btn.innerHTML = `<i class="fa fa-check"></i> ${chrome.i18n.getMessage('copiedButton')}`;
+					const setBtn = (iconCls, msgKey) => {
+						btn.textContent = '';
+						const i = document.createElement('i');
+						i.className = iconCls;
+						btn.appendChild(i);
+						btn.appendChild(document.createTextNode(' ' + chrome.i18n.getMessage(msgKey)));
+					};
+					setBtn('fa fa-check', 'copiedButton');
 					setTimeout(() => {
-						btn.innerHTML = `<i class="fa fa-copy"></i> ${chrome.i18n.getMessage('copyReportButton')}`;
+						setBtn('fa fa-copy', 'copyReportButton');
 					}, 2000);
 				}).catch((err) => {
 					console.error('Clipboard API failed:', err);
@@ -623,9 +630,16 @@ document.addEventListener('DOMContentLoaded', () => {
 				try {
 					// eslint-disable-next-line no-document-execCommand -- legacy fallback only
 					document.execCommand('copy');
-					btn.innerHTML = `<i class="fa fa-check"></i> ${chrome.i18n.getMessage('copiedButton')}`;
+					const setBtn = (iconCls, msgKey) => {
+						btn.textContent = '';
+						const i = document.createElement('i');
+						i.className = iconCls;
+						btn.appendChild(i);
+						btn.appendChild(document.createTextNode(' ' + chrome.i18n.getMessage(msgKey)));
+					};
+					setBtn('fa fa-check', 'copiedButton');
 					setTimeout(() => {
-						btn.innerHTML = `<i class="fa fa-copy"></i> ${chrome.i18n.getMessage('copyReportButton')}`;
+						setBtn('fa fa-copy', 'copyReportButton');
 					}, 2000);
 				} catch (err) {
 					console.error('Failed to copy:', err);
@@ -1293,86 +1307,65 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
-			//fix 3
-			if (filtered.length === 0) {
-				repoDropdown.textContent = '';
+			repoDropdown.textContent = '';
 
-				const loadingDiv = document.createElement('div');
-				loadingDiv.className = 'p-3 text-center text-gray-500 text-sm';
-				loadingDiv.textContent = chrome.i18n.getMessage('repoLoading');
+			filtered.slice(0, 10).forEach(repo => {
+				const item = document.createElement('div');
+				item.className = 'repository-dropdown-item';
+				item.dataset.repoName = repo.fullName;
 
-				repoDropdown.appendChild(loadingDiv);
+				const nameDiv = document.createElement('div');
+				nameDiv.className = 'repo-name';
 
+				const nameSpan = document.createElement('span');
+				nameSpan.textContent = repo.name;
+				nameDiv.appendChild(nameSpan);
 
-				const emptyDiv = document.createElement('div');
-				emptyDiv.className = 'p-3 text-center text-gray-500 text-sm';
-				emptyDiv.textContent = 'No repositories found';
+				if (repo.language) {
+					const langSpan = document.createElement('span');
+					langSpan.className = 'repo-language';
+					langSpan.textContent = repo.language;
+					nameDiv.appendChild(langSpan);
+				}
 
-				repoDropdown.appendChild(emptyDiv);
-			}
-			else {
+				if (repo.stars) {
+					const starSpan = document.createElement('span');
+					starSpan.className = 'repo-stars';
+					starSpan.textContent = `⭐ ${repo.stars}`;
+					nameDiv.appendChild(starSpan);
+				}
 
-				//fix 2
-				repoDropdown.innerHTML = '';
+				item.appendChild(nameDiv);
 
-				filtered.slice(0, 10).forEach(repo => {
-					const item = document.createElement('div');
-					item.className = 'repository-dropdown-item';
-					item.dataset.repoName = repo.fullName;
+				if (repo.description) {
+					const infoDiv = document.createElement('div');
+					infoDiv.className = 'repo-info';
 
-					const nameDiv = document.createElement('div');
-					nameDiv.className = 'repo-name';
+					const descSpan = document.createElement('span');
+					descSpan.className = 'repo-desc';
+					descSpan.textContent = repo.description.substring(0, 100);
 
-					const nameSpan = document.createElement('span');
-					nameSpan.textContent = repo.name;
-					nameDiv.appendChild(nameSpan);
+					infoDiv.appendChild(descSpan);
+					item.appendChild(infoDiv);
+				}
 
-					if (repo.language) {
-						const langSpan = document.createElement('span');
-						langSpan.className = 'repo-language';
-						langSpan.textContent = repo.language;
-						nameDiv.appendChild(langSpan);
-					}
-
-					if (repo.stars) {
-						const starSpan = document.createElement('span');
-						starSpan.className = 'repo-stars';
-						starSpan.textContent = `⭐ ${repo.stars}`;
-						nameDiv.appendChild(starSpan);
-					}
-
-					item.appendChild(nameDiv);
-
-					if (repo.description) {
-						const infoDiv = document.createElement('div');
-						infoDiv.className = 'repo-info';
-
-						const descSpan = document.createElement('span');
-						descSpan.className = 'repo-desc';
-						descSpan.textContent = repo.description.substring(0, 100);
-
-						infoDiv.appendChild(descSpan);
-						item.appendChild(infoDiv);
-					}
-
-					item.addEventListener('click', (e) => {
-						e.stopPropagation();
-						fnSelectedRepos(item.dataset.repoName);
-					});
-
-					repoDropdown.appendChild(item);
+				item.addEventListener('click', (e) => {
+					e.stopPropagation();
+					fnSelectedRepos(item.dataset.repoName);
 				});
 
-				if (filtered.length === 0) {
-					const notFoundDiv = document.createElement('div');
-					notFoundDiv.className = 'p-3 text-center text-gray-500 text-sm';
-					notFoundDiv.style.paddingLeft = '10px';
-					notFoundDiv.textContent = chrome.i18n.getMessage('repoNotFound');
-					repoDropdown.appendChild(notFoundDiv);
-				}
-				highlightedIndex = -1;
-				showDropdown();
+				repoDropdown.appendChild(item);
+			});
+
+			if (filtered.length === 0) {
+				const notFoundDiv = document.createElement('div');
+				notFoundDiv.className = 'p-3 text-center text-gray-500 text-sm';
+				notFoundDiv.style.paddingLeft = '10px';
+				notFoundDiv.textContent = chrome.i18n.getMessage('repoNotFound');
+				repoDropdown.appendChild(notFoundDiv);
 			}
+			highlightedIndex = -1;
+			showDropdown();
 		}
 
 		// FIX 9 (Scoping Bug): These helper functions were previously defined INSIDE
@@ -1569,6 +1562,9 @@ document.addEventListener('DOMContentLoaded', () => {
 			chrome.storage.local.get([`${platform}Username`], (result) => {
 				if (platformUsername) {
 					platformUsername.value = result[`${platform}Username`] || '';
+					if (typeof window.validateGenerateButton === 'function') {
+						window.validateGenerateButton();
+					}
 				}
 			});
 
@@ -1613,6 +1609,9 @@ document.addEventListener('DOMContentLoaded', () => {
 			chrome.storage.local.get([`${value}Username`], (result) => {
 				if (platformUsername) {
 					platformUsername.value = result[`${value}Username`] || '';
+					if (typeof window.validateGenerateButton === 'function') {
+						window.validateGenerateButton();
+					}
 				}
 			});
 
@@ -1809,10 +1808,18 @@ document.addEventListener('DOMContentLoaded', () => {
 		// refresh cache button
 
 		document.getElementById('refreshCache').addEventListener('click', async function () {
-			const originalText = this.innerHTML;
+			const setBtn = (iconCls, msg) => {
+				this.textContent = '';
+				const icon = document.createElement('i');
+				icon.className = iconCls;
+				this.appendChild(icon);
+				const span = document.createElement('span');
+				span.textContent = msg;
+				this.appendChild(span);
+			};
 
 			this.classList.add('loading');
-			this.innerHTML = `<i class="fa fa-refresh fa-spin"></i><span>${chrome.i18n.getMessage('refreshingButton')}</span>`;
+			setBtn('fa fa-refresh fa-spin', chrome.i18n.getMessage('refreshingButton'));
 			this.disabled = true;
 
 			try {
@@ -1855,22 +1862,22 @@ document.addEventListener('DOMContentLoaded', () => {
 					repoStatus.textContent = '';
 				}
 
-				this.innerHTML = `<i class="fa fa-check"></i><span>${chrome.i18n.getMessage('cacheClearedButton')}</span>`;
+				setBtn('fa fa-check', chrome.i18n.getMessage('cacheClearedButton'));
 				this.classList.remove('loading');
 
 				// Do NOT trigger report generation automatically
 
 				setTimeout(() => {
-					this.innerHTML = originalText;
+					setBtn('fa fa-refresh', chrome.i18n.getMessage('refreshDataButton'));
 					this.disabled = false;
 				}, 2000);
 			} catch (error) {
 				console.error('Cache clear failed:', error);
-				this.innerHTML = `<i class="fa fa-exclamation-triangle"></i><span>${chrome.i18n.getMessage('cacheClearFailed')}</span>`;
+				setBtn('fa fa-exclamation-triangle', chrome.i18n.getMessage('cacheClearFailed'));
 				this.classList.remove('loading');
 
 				setTimeout(() => {
-					this.innerHTML = originalText;
+					setBtn('fa fa-refresh', chrome.i18n.getMessage('refreshDataButton'));
 					this.disabled = false;
 				}, 3000);
 			}
@@ -1907,6 +1914,9 @@ document.addEventListener('DOMContentLoaded', () => {
 					// Calling window.triggerRepoFetchIfEnabled directly (set by the repo-filter block).
 					if (window.triggerRepoFetchIfEnabled) {
 						window.triggerRepoFetchIfEnabled();
+					}
+					if (typeof window.validateGenerateButton === 'function') {
+						window.validateGenerateButton();
 					}
 				},
 			);
