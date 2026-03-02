@@ -12,6 +12,14 @@ function logError(...args) {
 	}
 }
 
+function escapeHTML(str) {
+	if (typeof str !== 'string') return str;
+	return str.replace(/[&<>"']/g, function (m) {
+		const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+		return map[m];
+	});
+}
+
 let refreshButton_Placed = false;
 let enableToggle = true;
 let hasInjectedContent = false;
@@ -207,12 +215,16 @@ function allIncluded(outputTarget = 'email') {
 						if (outputTarget === 'email') {
 							(async () => {
 								try {
+
 									const data = await gitlabHelper.fetchGitLabData(
 										platformUsernameLocal,
 										startingDate,
 										endingDate,
 										gitlabToken,
 									);
+
+									// const data = await gitlabHelper.fetchGitLabData(platformUsernameLocal, startingDate, endingDate, gitlabToken);
+
 
 									function mapGitLabItem(item, projects, type) {
 										const project = projects.find((p) => p.id === item.project_id);
@@ -267,7 +279,12 @@ function allIncluded(outputTarget = 'email') {
 										}
 										const scrumReport = document.getElementById('scrumReport');
 										if (scrumReport) {
-											scrumReport.innerHTML = `<div class=\"error-message\" style=\"color: #dc2626; font-weight: bold; padding: 10px;\">${err.message || 'An error occurred while fetching GitLab data.'}</div>`;
+											scrumReport.textContent = '';
+											const errDiv = document.createElement('div');
+											errDiv.className = 'error-message';
+											errDiv.style.cssText = 'color: #dc2626; font-weight: bold; padding: 10px;';
+											errDiv.textContent = err.message || 'An error occurred while fetching GitLab data.';
+											scrumReport.appendChild(errDiv);
 										}
 									}
 									scrumGenerationInProgress = false;
@@ -315,7 +332,12 @@ function allIncluded(outputTarget = 'email') {
 										}
 										const scrumReport = document.getElementById('scrumReport');
 										if (scrumReport) {
-											scrumReport.innerHTML = `<div class=\"error-message\" style=\"color: #dc2626; font-weight: bold; padding: 10px;\">${err.message || 'An error occurred while fetching GitLab data.'}</div>`;
+											scrumReport.textContent = '';
+											const errDiv = document.createElement('div');
+											errDiv.className = 'error-message';
+											errDiv.style.cssText = 'color: #dc2626; font-weight: bold; padding: 10px;';
+											errDiv.textContent = err.message || 'An error occurred while fetching GitLab data.';
+											scrumReport.appendChild(errDiv);
 										}
 									}
 									scrumGenerationInProgress = false;
@@ -768,7 +790,12 @@ function allIncluded(outputTarget = 'email') {
 						else if (err.message) errorMsg = err.message;
 						else errorMsg = JSON.stringify(err);
 					}
-					scrumReport.innerHTML = `<div class="error-message" style="color: #dc2626; font-weight: bold; padding: 10px;">${err.message || 'An error occurred while generating the report.'}</div>`;
+					scrumReport.textContent = '';
+					const errDiv = document.createElement('div');
+					errDiv.className = 'error-message';
+					errDiv.style.cssText = 'color: #dc2626; font-weight: bold; padding: 10px;';
+					errDiv.textContent = errorMsg;
+					scrumReport.appendChild(errDiv);
 					generateBtn.innerHTML = '<i class="fa fa-refresh"></i> Generate Report';
 					generateBtn.disabled = false;
 				}
@@ -1080,7 +1107,8 @@ ${userReason}`;
 			const scrumReport = document.getElementById('scrumReport');
 			if (scrumReport) {
 				log('Found popup div, updating content');
-				scrumReport.innerHTML = content;
+				scrumReport.innerHTML = '';
+				scrumReport.appendChild(document.createRange().createContextualFragment(content));
 
 				const generateBtn = document.getElementById('generateReport');
 				if (generateBtn) {
@@ -1338,7 +1366,7 @@ ${userReason}`;
 						"' target='_blank' rel='noopener noreferrer'>#" +
 						pr_arr.number +
 						'</a> (' +
-						pr_arr.title +
+						escapeHTML(pr_arr.title) +
 						') ';
 					if (showOpenLabel && pr_arr.state === 'open') prText += issue_opened_button;
 					// Do not show closed label for reviewed PRs
@@ -1356,7 +1384,7 @@ ${userReason}`;
 						"' target='_blank' rel='noopener noreferrer'>#" +
 						pr_arr1.number +
 						'</a> (' +
-						pr_arr1.title +
+						escapeHTML(pr_arr1.title) +
 						') ';
 					if (showOpenLabel && pr_arr1.state === 'open') prText1 += issue_opened_button;
 					// Do not show closed label for reviewed PRs
@@ -1588,30 +1616,30 @@ ${userReason}`;
 				}
 
 				if (isDraft) {
-					li = `<li><i>(${project})</i> - Made PR <a href='${html_url}' target='_blank' rel='noopener noreferrer' contenteditable='false'>(#${number})</a> - <a href='${html_url}' target='_blank' rel='noopener noreferrer' contenteditable='false'>${title}</a>${showOpenLabel ? ' ' + pr_draft_button : ''}`;
+					li = `<li><i>(${project})</i> - Made PR <a href='${html_url}' target='_blank' rel='noopener noreferrer' contenteditable='false'>(#${number})</a> - <a href='${html_url}' target='_blank' rel='noopener noreferrer' contenteditable='false'>${escapeHTML(title)}</a>${showOpenLabel ? ' ' + pr_draft_button : ''}`;
 					if (showCommits && item._allCommits && item._allCommits.length && !isNewPR) {
 						log(`[PR DEBUG] Rendering commits for existing draft PR #${number}:`, item._allCommits);
 						li += '<ul>';
 						item._allCommits.forEach((commit) => {
-							li += `<li style=\"list-style: disc; color: #666;\"><span style=\"color:#2563eb;\">${commit.messageHeadline}</span><span style=\"color:#666; font-size: 11px;\"> (${new Date(commit.committedDate).toLocaleString()})</span></li>`;
+							li += `<li style=\"list-style: disc; color: #666;\"><span style=\"color:#2563eb;\">${escapeHTML(commit.messageHeadline)}</span><span style=\"color:#666; font-size: 11px;\"> (${new Date(commit.committedDate).toLocaleString()})</span></li>`;
 						});
 						li += '</ul>';
 					}
 					li += `</li>`;
 				} else if (item.state === 'open' || item.state === 'opened') {
-					li = `<li><i>(${project})</i> - ${prAction} <a href='${html_url}' target='_blank' rel='noopener noreferrer' contenteditable='false'>(#${number})</a> - <a href='${html_url}' target='_blank' rel='noopener noreferrer' contenteditable='false'>${title}</a>${showOpenLabel ? ' ' + pr_open_button : ''}`;
+					li = `<li><i>(${project})</i> - ${prAction} <a href='${html_url}' target='_blank' rel='noopener noreferrer' contenteditable='false'>(#${number})</a> - <a href='${html_url}' target='_blank' rel='noopener noreferrer' contenteditable='false'>${escapeHTML(title)}</a>${showOpenLabel ? ' ' + pr_open_button : ''}`;
 
 					if (showCommits && item._allCommits && item._allCommits.length && !isNewPR) {
 						log(`[PR DEBUG] Rendering commits for existing PR #${number}:`, item._allCommits);
 						li += '<ul>';
 						item._allCommits.forEach((commit) => {
-							li += `<li style=\"list-style: disc; color: #666;\"><span style=\"color:#2563eb;\">${commit.messageHeadline}</span><span style=\"color:#666; font-size: 11px;\"> (${new Date(commit.committedDate).toLocaleString()})</span></li>`;
+							li += `<li style=\"list-style: disc; color: #666;\"><span style=\"color:#2563eb;\">${escapeHTML(commit.messageHeadline)}</span><span style=\"color:#666; font-size: 11px;\"> (${new Date(commit.committedDate).toLocaleString()})</span></li>`;
 						});
 						li += '</ul>';
 					}
 					li += `</li>`;
 				} else if (platform === 'gitlab' && item.state === 'closed') {
-					li = `<li><i>(${project})</i> - ${prAction} <a href='${html_url}' target='_blank' rel='noopener noreferrer' contenteditable='false'>(#${number})</a> - <a href='${html_url}' target='_blank' rel='noopener noreferrer' contenteditable='false'>${title}</a>${showOpenLabel ? ' ' + pr_closed_button : ''}</li>`;
+					li = `<li><i>(${project})</i> - ${prAction} <a href='${html_url}' target='_blank' rel='noopener noreferrer' contenteditable='false'>(#${number})</a> - <a href='${html_url}' target='_blank' rel='noopener noreferrer' contenteditable='false'>${escapeHTML(title)}</a>${showOpenLabel ? ' ' + pr_closed_button : ''}</li>`;
 				} else {
 					let merged = null;
 					if ((githubToken || (useMergedStatus && !fallbackToSimple)) && mergedStatusResults) {
@@ -1621,10 +1649,10 @@ ${userReason}`;
 						merged = mergedStatusResults[`${owner}/${repo}#${number}`];
 					}
 					if (merged === true) {
-						li = `<li><i>(${project})</i> - ${prAction} <a href='${html_url}' target='_blank' rel='noopener noreferrer' contenteditable='false'>(#${number})</a> - <a href='${html_url}' target='_blank' rel='noopener noreferrer' contenteditable='false'>${title}</a>${showOpenLabel ? ' ' + pr_merged_button : ''}</li>`;
+						li = `<li><i>(${project})</i> - ${prAction} <a href='${html_url}' target='_blank' rel='noopener noreferrer' contenteditable='false'>(#${number})</a> - <a href='${html_url}' target='_blank' rel='noopener noreferrer' contenteditable='false'>${escapeHTML(title)}</a>${showOpenLabel ? ' ' + pr_merged_button : ''}</li>`;
 					} else {
 						// Always show closed label for merged === false or merged === null/undefined
-						li = `<li><i>(${project})</i> - ${prAction} <a href='${html_url}' target='_blank' rel='noopener noreferrer' contenteditable='false'>(#${number})</a> - <a href='${html_url}' target='_blank' rel='noopener noreferrer' contenteditable='false'>${title}</a>${showOpenLabel ? ' ' + pr_closed_button : ''}</li>`;
+						li = `<li><i>(${project})</i> - ${prAction} <a href='${html_url}' target='_blank' rel='noopener noreferrer' contenteditable='false'>(#${number})</a> - <a href='${html_url}' target='_blank' rel='noopener noreferrer' contenteditable='false'>${escapeHTML(title)}</a>${showOpenLabel ? ' ' + pr_closed_button : ''}</li>`;
 					}
 				}
 				log('[SCRUM-DEBUG] Added PR/MR to lastWeekArray:', li, item);
@@ -1641,7 +1669,7 @@ ${userReason}`;
 						") - <a href='" +
 						html_url +
 						"' target='_blank' rel='noopener noreferrer'>" +
-						title +
+						escapeHTML(title) +
 						'</a>' +
 						(showOpenLabel ? ' ' + issue_opened_button : '') +
 						'&nbsp;&nbsp;</li>';
@@ -1655,19 +1683,19 @@ ${userReason}`;
 				const isCreatedToday = today.getTime() === itemCreatedDate.getTime();
 				const issueActionText = isCreatedToday ? 'Opened Issue' : 'Updated Issue';
 				if (item.state === 'open') {
-					li = `<li><i>(${project})</i> - ${issueActionText}(#${number}) - <a href='${html_url}'>${title}</a>${showOpenLabel ? ' ' + issue_opened_button : ''}</li>`;
+					li = `<li><i>(${project})</i> - ${issueActionText}(#${number}) - <a href='${html_url}'>${escapeHTML(title)}</a>${showOpenLabel ? ' ' + issue_opened_button : ''}</li>`;
 				} else if (item.state === 'closed') {
 					// Use state_reason to distinguish closure reason
 					if (item.state_reason === 'completed') {
-						li = `<li><i>(${project})</i> - ${issueActionText}(#${number}) - <a href='${html_url}'>${title}</a> ${issue_closed_completed_button}</li>`;
+						li = `<li><i>(${project})</i> - ${issueActionText}(#${number}) - <a href='${html_url}'>${escapeHTML(title)}</a> ${issue_closed_completed_button}</li>`;
 					} else if (item.state_reason === 'not_planned') {
-						li = `<li><i>(${project})</i> - ${issueActionText}(#${number}) - <a href='${html_url}'>${title}</a> ${issue_closed_notplanned_button}</li>`;
+						li = `<li><i>(${project})</i> - ${issueActionText}(#${number}) - <a href='${html_url}'>${escapeHTML(title)}</a> ${issue_closed_notplanned_button}</li>`;
 					} else {
-						li = `<li><i>(${project})</i> - ${issueActionText}(#${number}) - <a href='${html_url}'>${title}</a> ${issue_closed_button}</li>`;
+						li = `<li><i>(${project})</i> - ${issueActionText}(#${number}) - <a href='${html_url}'>${escapeHTML(title)}</a> ${issue_closed_button}</li>`;
 					}
 				} else {
 					// Fallback for unexpected state
-					li = `<li><i>(${project})</i> - ${issueActionText}(#${number}) - <a href='${html_url}'>${title}</a></li>`;
+					li = `<li><i>(${project})</i> - ${issueActionText}(#${number}) - <a href='${html_url}'>${escapeHTML(title)}</a></li>`;
 				}
 
 				log('[SCRUM-DEBUG] Added issue to lastWeekArray:', li, item);
@@ -1854,12 +1882,12 @@ async function fetchPrsMergedStatusBatch(prs, headers) {
 	if (prs.length === 0) return results;
 	const query = `query {
 ${prs
-	.map(
-		(pr, i) => `	repo${i}: repository(owner: \"${pr.owner}\", name: \"${pr.repo}\") {
+			.map(
+				(pr, i) => `	repo${i}: repository(owner: \"${pr.owner}\", name: \"${pr.repo}\") {
 		pr${i}: pullRequest(number: ${pr.number}) { merged }
 	}`,
-	)
-	.join('\n')}
+			)
+			.join('\n')}
 }`;
 
 	try {
@@ -2041,8 +2069,8 @@ async function fetchUserRepositories(username, token, org = '') {
 				}));
 
 			return repos.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
-		} catch (err) {}
-	} catch (err) {}
+		} catch (err) { }
+	} catch (err) { }
 }
 
 function filterDataByRepos(data, selectedRepos) {
