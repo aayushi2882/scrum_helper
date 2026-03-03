@@ -189,11 +189,21 @@ function allIncluded(outputTarget = 'email') {
 							const scrumReport = document.getElementById('scrumReport');
 							const generateBtn = document.getElementById('generateReport');
 							if (scrumReport) {
-								scrumReport.innerHTML =
-									'<div class="error-message" style="color: #dc2626; font-weight: bold; padding: 10px;">Please enter your username to generate a report.</div>';
+								scrumReport.textContent = '';
+								const errorDiv = document.createElement('div');
+								errorDiv.className = 'error-message';
+								errorDiv.style.color = '#dc2626';
+								errorDiv.style.fontWeight = 'bold';
+								errorDiv.style.padding = '10px';
+								errorDiv.textContent = 'Please enter your username to generate a report.';
+								scrumReport.appendChild(errorDiv);
 							}
 							if (generateBtn) {
-								generateBtn.innerHTML = '<i class="fa fa-refresh"></i> Generate Report';
+								generateBtn.textContent = '';
+								const iIcon = document.createElement('i');
+								iIcon.className = 'fa fa-refresh';
+								generateBtn.appendChild(iIcon);
+								generateBtn.appendChild(document.createTextNode(' Generate Report'));
 								generateBtn.disabled = false;
 							}
 							scrumGenerationInProgress = false;
@@ -208,7 +218,11 @@ function allIncluded(outputTarget = 'email') {
 					if (platformUsernameLocal) {
 						const generateBtn = document.getElementById('generateReport');
 						if (generateBtn && outputTarget === 'popup') {
-							generateBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Generating...';
+							generateBtn.textContent = '';
+							const iSpin = document.createElement('i');
+							iSpin.className = 'fa fa-spinner fa-spin';
+							generateBtn.appendChild(iSpin);
+							generateBtn.appendChild(document.createTextNode(' Generating...'));
 							generateBtn.disabled = true;
 						}
 
@@ -274,7 +288,11 @@ function allIncluded(outputTarget = 'email') {
 									console.error('GitLab fetch failed:', err);
 									if (outputTarget === 'popup') {
 										if (generateBtn) {
-											generateBtn.innerHTML = '<i class="fa fa-refresh"></i> Generate Report';
+											generateBtn.textContent = '';
+											const iIcon = document.createElement('i');
+											iIcon.className = 'fa fa-refresh';
+											generateBtn.appendChild(iIcon);
+											generateBtn.appendChild(document.createTextNode(' Generate Report'));
 											generateBtn.disabled = false;
 										}
 										const scrumReport = document.getElementById('scrumReport');
@@ -327,7 +345,11 @@ function allIncluded(outputTarget = 'email') {
 									console.error('GitLab fetch failed:', err);
 									if (outputTarget === 'popup') {
 										if (generateBtn) {
-											generateBtn.innerHTML = '<i class="fa fa-refresh"></i> Generate Report';
+											generateBtn.textContent = '';
+											const iIcon = document.createElement('i');
+											iIcon.className = 'fa fa-refresh';
+											generateBtn.appendChild(iIcon);
+											generateBtn.appendChild(document.createTextNode(' Generate Report'));
 											generateBtn.disabled = false;
 										}
 										const scrumReport = document.getElementById('scrumReport');
@@ -349,11 +371,21 @@ function allIncluded(outputTarget = 'email') {
 							const scrumReport = document.getElementById('scrumReport');
 							const generateBtn = document.getElementById('generateReport');
 							if (scrumReport) {
-								scrumReport.innerHTML =
-									'<div class="error-message" style="color: #dc2626; font-weight: bold; padding: 10px;">Please enter your username to generate a report.</div>';
+								scrumReport.textContent = '';
+								const errorDiv = document.createElement('div');
+								errorDiv.className = 'error-message';
+								errorDiv.style.color = '#dc2626';
+								errorDiv.style.fontWeight = 'bold';
+								errorDiv.style.padding = '10px';
+								errorDiv.textContent = 'Please enter your username to generate a report.';
+								scrumReport.appendChild(errorDiv);
 							}
 							if (generateBtn) {
-								generateBtn.innerHTML = '<i class="fa fa-refresh"></i> Generate Report';
+								generateBtn.textContent = '';
+								const iIcon = document.createElement('i');
+								iIcon.className = 'fa fa-refresh';
+								generateBtn.appendChild(iIcon);
+								generateBtn.appendChild(document.createTextNode(' Generate Report'));
 								generateBtn.disabled = false;
 							}
 						}
@@ -364,8 +396,14 @@ function allIncluded(outputTarget = 'email') {
 					if (outputTarget === 'popup') {
 						const scrumReport = document.getElementById('scrumReport');
 						if (scrumReport) {
-							scrumReport.innerHTML =
-								'<div class="error-message" style="color: #dc2626; font-weight: bold; padding: 10px;">Unknown platform selected.</div>';
+							scrumReport.textContent = '';
+							const errorDiv = document.createElement('div');
+							errorDiv.className = 'error-message';
+							errorDiv.style.color = '#dc2626';
+							errorDiv.style.fontWeight = 'bold';
+							errorDiv.style.padding = '10px';
+							errorDiv.textContent = 'Unknown platform selected.';
+							scrumReport.appendChild(errorDiv);
 						}
 					}
 					scrumGenerationInProgress = false;
@@ -796,11 +834,19 @@ function allIncluded(outputTarget = 'email') {
 					errDiv.style.cssText = 'color: #dc2626; font-weight: bold; padding: 10px;';
 					errDiv.textContent = errorMsg;
 					scrumReport.appendChild(errDiv);
-					generateBtn.innerHTML = '<i class="fa fa-refresh"></i> Generate Report';
+					generateBtn.textContent = '';
+					const iIcon1 = document.createElement('i');
+					iIcon1.className = 'fa fa-refresh';
+					generateBtn.appendChild(iIcon1);
+					generateBtn.appendChild(document.createTextNode(' Generate Report'));
 					generateBtn.disabled = false;
 				}
 				if (generateBtn) {
-					generateBtn.innerHTML = '<i class="fa fa-refresh"></i> Generate Report';
+					generateBtn.textContent = '';
+					const iIcon2 = document.createElement('i');
+					iIcon2.className = 'fa fa-refresh';
+					generateBtn.appendChild(iIcon2);
+					generateBtn.appendChild(document.createTextNode(' Generate Report'));
 					generateBtn.disabled = false;
 				}
 			}
@@ -973,11 +1019,21 @@ function allIncluded(outputTarget = 'email') {
 		if (outputTarget === 'popup') {
 			const reportDiv = document.getElementById('scrumReport');
 			if (reportDiv) {
-				reportDiv.innerHTML =
-					'<div class="error-message" style="color: #dc2626; font-weight: bold; padding: 10px;">Invalid or expired GitHub token. Please check your token in the settings and try again.</div>';
+				reportDiv.textContent = '';
+				const tErr = document.createElement('div');
+				tErr.className = 'error-message';
+				tErr.style.color = '#dc2626';
+				tErr.style.fontWeight = 'bold';
+				tErr.style.padding = '10px';
+				tErr.textContent = 'Invalid or expired GitHub token. Please check your token in the settings and try again.';
+				reportDiv.appendChild(tErr);
 				const generateBtn = document.getElementById('generateReport');
 				if (generateBtn) {
-					generateBtn.innerHTML = '<i class="fa fa-refresh"></i> Generate Report';
+					generateBtn.textContent = '';
+					const iconT = document.createElement('i');
+					iconT.className = 'fa fa-refresh';
+					generateBtn.appendChild(iconT);
+					generateBtn.appendChild(document.createTextNode(' Generate Report'));
 					generateBtn.disabled = false;
 				}
 			} else {
@@ -1093,26 +1149,30 @@ ${lastWeekUl}<br>
 <b>2. What do I plan to do ${weekOrDay2}?</b><br>
 ${nextWeekUl}<br>
 <b>3. What is blocking me from making progress?</b><br>
-${userReason}`;
+${escapeHTML(userReason).replace(/\n/g, '<br>')}`;
 		} else {
 			content = `<b>1. What did I do from ${formatDate(startingDate)} to ${formatDate(endingDate)}?</b><br>
 ${lastWeekUl}<br>
 <b>2. What do I plan to do ${weekOrDay2}?</b><br>
 ${nextWeekUl}<br>
 <b>3. What is blocking me from making progress?</b><br>
-${userReason}`;
+${escapeHTML(userReason).replace(/\n/g, '<br>')}`;
 		}
 
 		if (outputTarget === 'popup') {
 			const scrumReport = document.getElementById('scrumReport');
 			if (scrumReport) {
 				log('Found popup div, updating content');
-				scrumReport.innerHTML = '';
+				scrumReport.textContent = '';
 				scrumReport.appendChild(document.createRange().createContextualFragment(content));
 
 				const generateBtn = document.getElementById('generateReport');
 				if (generateBtn) {
-					generateBtn.innerHTML = '<i class="fa fa-refresh"></i> Generate Report';
+					generateBtn.textContent = '';
+					const gIcon = document.createElement('i');
+					gIcon.className = 'fa fa-refresh';
+					generateBtn.appendChild(gIcon);
+					generateBtn.appendChild(document.createTextNode(' Generate Report'));
 					generateBtn.disabled = false;
 				}
 			} else {
